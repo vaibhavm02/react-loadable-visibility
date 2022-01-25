@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { IntersectionObserver } from "./capacities";
 
-let intersectionObserver;
 const trackedElements = new Map();
 
-const NewIntersectionObserver = (intersectionObserverOptions) => {
+function NewIntersectionObserver(intersectionObserverOptions) {
   let intersectionObserver;
-  const trackedElements = new Map();
 
   if (IntersectionObserver) {
     intersectionObserver = new window.IntersectionObserver(
@@ -26,7 +24,7 @@ const NewIntersectionObserver = (intersectionObserverOptions) => {
     );
   }
   return intersectionObserver;
-};
+}
 
 function createLoadableVisibilityComponent(
   args,
