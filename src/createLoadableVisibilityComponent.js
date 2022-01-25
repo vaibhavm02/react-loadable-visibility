@@ -4,31 +4,42 @@ import { IntersectionObserver } from "./capacities";
 let intersectionObserver;
 const trackedElements = new Map();
 
-if (IntersectionObserver) {
-  intersectionObserver = new window.IntersectionObserver(
-    (entries, observer) => {
-      entries.forEach(entry => {
-        const visibilityHandler = trackedElements.get(entry.target);
+const NewIntersectionObserver = (intersectionObserverOptions) => {
+  let intersectionObserver;
+  const trackedElements = new Map();
 
-        if (
-          visibilityHandler &&
-          (entry.isIntersecting || entry.intersectionRatio > 0)
-        ) {
-          visibilityHandler();
-        }
-      });
-    }
-  );
-}
+  if (IntersectionObserver) {
+    intersectionObserver = new window.IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          const visibilityHandler = trackedElements.get(entry.target);
+
+          if (
+            visibilityHandler &&
+            (entry.isIntersecting || entry.intersectionRatio > 0)
+          ) {
+            visibilityHandler();
+          }
+        });
+      },
+      intersectionObserverOptions
+    );
+  }
+  return intersectionObserver;
+};
 
 function createLoadableVisibilityComponent(
   args,
-  { Loadable, preloadFunc, LoadingComponent }
+  { Loadable, preloadFunc, LoadingComponent, intersectionObserverOptions }
 ) {
   let preloaded = false;
   const visibilityHandlers = [];
 
   const LoadableComponent = Loadable(...args);
+
+  const intersectionObserver = NewIntersectionObserver(
+    intersectionObserverOptions
+  );
 
   function LoadableVisibilityComponent(props) {
     const visibilityElementRef = useRef();
@@ -75,7 +86,7 @@ function createLoadableVisibilityComponent(
           style={{
             display: "inline-block",
             minHeight: "1px",
-            minWidth: "1px"
+            minWidth: "1px",
           }}
           {...props}
           ref={visibilityElementRef}
@@ -83,7 +94,7 @@ function createLoadableVisibilityComponent(
           {LoadingComponent
             ? React.createElement(LoadingComponent, {
                 isLoading: true,
-                ...props
+                ...props,
               })
             : props.fallback}
         </div>
@@ -102,7 +113,7 @@ function createLoadableVisibilityComponent(
   LoadableVisibilityComponent[preloadFunc] = () => {
     if (!preloaded) {
       preloaded = true;
-      visibilityHandlers.forEach(handler => handler());
+      visibilityHandlers.forEach((handler) => handler());
     }
 
     return LoadableComponent[preloadFunc]();
