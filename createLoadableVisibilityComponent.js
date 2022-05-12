@@ -39,6 +39,7 @@ var intersectionObserver = createIntersectionObserver(options);
 function createLoadableVisibilityComponent(args, _ref) {
   var Loadable = _ref.Loadable,
       preloadFunc = _ref.preloadFunc,
+      loadFunc = _ref.loadFunc,
       LoadingComponent = _ref.LoadingComponent,
       intersectionObserverOptions = _ref.intersectionObserverOptions;
 
@@ -47,7 +48,8 @@ function createLoadableVisibilityComponent(args, _ref) {
     intersectionObserver = createIntersectionObserver(intersectionObserverOptions);
   }
 
-  var preloaded = false;
+  var preloaded = false,
+      loaded = false;
   var visibilityHandlers = [];
   var LoadableComponent = Loadable.apply(void 0, args);
 
@@ -125,6 +127,17 @@ function createLoadableVisibilityComponent(args, _ref) {
     }
 
     return LoadableComponent[preloadFunc]();
+  };
+
+  LoadableVisibilityComponent[loadFunc] = function () {
+    if (!loaded) {
+      loaded = true;
+      visibilityHandlers.forEach(function (handler) {
+        return handler();
+      });
+    }
+
+    return LoadableComponent[loadFunc]();
   };
 
   return LoadableVisibilityComponent;

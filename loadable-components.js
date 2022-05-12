@@ -23,6 +23,7 @@ function loadableVisiblity(load, opts, intersectionObserverOptions) {
     return (0, _createLoadableVisibilityComponent["default"])([load, opts], {
       Loadable: _component["default"],
       preloadFunc: "preload",
+      loadFunc: "load",
       LoadingComponent: opts.fallback ? function () {
         return opts.fallback;
       } : null,
